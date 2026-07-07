@@ -34,6 +34,9 @@ ssh -i "$KEY_FILE" \
   -o StrictHostKeyChecking=accept-new \
   -o ConnectTimeout=20 \
   "${SSH_USER}@${HETZNER_HOST}" \
-  'cd /srv/portfolio && git pull && docker compose up -d --build'
+  'cd /srv/portfolio && git pull && docker compose up -d --build && \
+   if docker ps --format "{{.Names}}" | grep -qx "health-bridge-caddy-1"; then \
+     docker network connect portfolio_default health-bridge-caddy-1 2>/dev/null || true; \
+   fi'
 
 rm -f "$KEY_FILE"
